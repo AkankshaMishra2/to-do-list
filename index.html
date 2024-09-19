@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do List</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1a1a2e;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #fff;
+        }
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: #edeff2;
+            padding: 10px 0;
+            text-align: center;
+        }
+        nav a {
+            color: #16213e;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+        .container {
+            background: #16213e;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            width: 400px;
+        }
+        h1 {
+            text-align: center;
+            color: #f6eeef;
+            margin-bottom: 20px;
+        }
+        input[type="text"], input[type="date"], input[type="time"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #0f3460;
+            border-radius: 5px;
+            background-color: #ebeef1;
+            color: #000;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid #0f3460;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #0f3460;
+            color: #fff;
+        }
+        td {
+            background-color: #16213e;
+            color: #fff;
+        }
+        button {
+            background: #e94560;
+            border: none;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #ff6f91;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+    </nav>
+    <div class="container">
+        <h1>To-Do List</h1>
+        <input type="text" id="taskInput" placeholder="Add a new task...">
+        <input type="text" id="personInput" placeholder="Assigned to...">
+        <input type="date" id="dueDateInput" placeholder="Due date...">
+        <input type="time" id="dueTimeInput" placeholder="Due time...">
+        <table>
+            <thead>
+                <tr>
+                    <th>Task</th>
+                    <th>Assigned To</th>
+                    <th>Due Date</th>
+                    <th>Due Time</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="taskList"></tbody>
+        </table>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', loadTasks);
+        document.getElementById('taskInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                addTask();
+            }
+        });
+        document.getElementById('personInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                addTask();
+            }
+        });
+        document.getElementById('dueDateInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                addTask();
+            }
+        });
+        document.getElementById('dueTimeInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                addTask();
+            }
+        });
+
+        function loadTasks() {
+            let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+            tasks.forEach(task => addTaskToDOM(task));
+        }
+
+        function addTask() {
+            const taskInput = document.getElementById('taskInput');
+            const personInput = document.getElementById('personInput');
+            const dueDateInput = document.getElementById('dueDateInput');
+            const dueTimeInput = document.getElementById('dueTimeInput');
+            const task = taskInput.value.trim();
+            const person = personInput.value.trim();
+            const dueDate = dueDateInput.value.trim();
+            const dueTime = dueTimeInput.value.trim();
+            if (task && person && dueDate && dueTime) {
+                const taskObj = { task, person, dueDate, dueTime };
+                addTaskToDOM(taskObj);
+                saveTask(taskObj);
+                taskInput.value = '';
+                personInput.value = '';
+                dueDateInput.value = '';
+                dueTimeInput.value = '';
+            }
+        }
+
+        function addTaskToDOM(taskObj) {
+            const taskList = document.getElementById('taskList');
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${taskObj.task}</td>
+                <td>${taskObj.person}</td>
+                <td>${taskObj.dueDate}</td>
+                <td>${taskObj.dueTime}</td>
+                <td><button onclick="removeTask('${taskObj.task}')">Delete</button></td>
+            `;
+            taskList.appendChild(tr);
+        }
+
+        function saveTask(taskObj) {
+            let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+            tasks.push(taskObj);
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+        }
+
+        function removeTask(task) {
+            let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+            tasks = tasks.filter(t => t.task !== task);
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+            document.getElementById('taskList').innerHTML = '';
+            loadTasks();
+        }
+    </script>
+</body>
+</html>
